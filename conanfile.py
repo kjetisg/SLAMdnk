@@ -1,9 +1,12 @@
 from conans import ConanFile, CMake, tools
 
+import os
+print(os.getenv("SHORTVER", 0.1))
+ver = str(os.getenv("SHORTVER", 0.1))
 
 class SLAMdnkConan(ConanFile):
     name = "SLAMdnk"
-    version = "0.1"
+    version = ver
     license = "<Put the package license here>"
     author = "KSG"
     url = "<Package recipe repository url here, for issues about the package>"
@@ -13,40 +16,36 @@ class SLAMdnkConan(ConanFile):
     options = {"shared": [True, False], "fPIC": [True, False]}
     default_options = {"shared": False, "fPIC": True}
     generators = "cmake"
-    export_sources = "src/*"
+    export_sources = "*" #"src/*"
 
     def config_options(self):
         if self.settings.os == "Windows":
             del self.options.fPIC
 
-    def source(self):
-        self.run("git clone https://github.com/conan-io/hello.git")
-        # This small hack might be useful to guarantee proper /MT /MD linkage
-        # in MSVC if the packaged project doesn't have variables to set it
-        # properly
-        tools.replace_in_file("hello/CMakeLists.txt", "PROJECT(SLAMdnk)",
-                              '''PROJECT(SLAMdnk)
-include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-conan_basic_setup()''')
+    def configure(self):
+        self.options["opencv"].parallel="tbb"
+        self.options["opencv"].shared=True
 
-    def build(self):
-        cmake = CMake(self)
-        cmake.configure(source_folder="src")
-        cmake.build()
+    def requirements(self):
+        self.requires("eigen/3.3.9")
+        self.requires("opencv/4.5.1")
 
-        # Explicit way:
-        # self.run('cmake %s/hello %s'
-        #          % (self.source_folder, cmake.command_line))
-        # self.run("cmake --build . %s" % cmake.build_config)
 
     def package(self):
-        self.copy("*.h", dst="include", src="src")
-        # self.copy("*hello.lib", dst="lib", keep_path=False)
-        self.copy("*.dll", dst="bin", keep_path=False)
-        self.copy("*.so", dst="lib", keep_path=False)
-        self.copy("*.dylib", dst="lib", keep_path=False)
-        self.copy("*.a", dst="lib", keep_path=False)
+        # self.copy("*.h", dst="include", src="src")
+        # # self.copy("*hello.lib", dst="lib", keep_path=False)
+        # self.copy("*.dll", dst="bin", keep_path=False)
+        # self.copy("*.so", dst="lib", keep_path=False)
+        # self.copy("*.dylib", dst="lib", keep_path=False)
+        # self.copy("*.a", dst="lib", keep_path=False)
+        self.copy("*.dll", dst="bin", src="bin")
+        self.copy("*.dylib", dst="bin", src="lib")
+        # self.copy("*.lib", dst="bin", src="lib")
 
     def package_info(self):
         self.cpp_info.libs = ["SLAMdnk"]
 
+    def build(self):
+        cmake = CMake(self)
+        cmake.configure()#source_folder="src")
+        cmake.build()
