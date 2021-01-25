@@ -11,12 +11,12 @@ class SLAMdnkConan(ConanFile):
     author = "KSG"
     url = "<Package recipe repository url here, for issues about the package>"
     description = "<Description of SLAMdnk here>"
-    topics = ("<Put some tag here>", "<here>", "<and here>")
+    topics = ("SLAM", "ML", "NN", "SensorFusion")
     settings = "os", "compiler", "build_type", "arch"
     options = {"shared": [True, False], "fPIC": [True, False]}
     default_options = {"shared": False, "fPIC": True}
     generators = "cmake"
-    export_sources = "*" #"src/*"
+    export_sources = "*"
 
     def config_options(self):
         if self.settings.os == "Windows":
@@ -24,12 +24,13 @@ class SLAMdnkConan(ConanFile):
 
     def configure(self):
         self.options["opencv"].parallel="tbb"
-        self.options["opencv"].shared=True
+        self.options["gtsam"].with_TBB=True
 
     def requirements(self):
         self.requires("eigen/3.3.9")
         self.requires("opencv/4.5.1")
-
+        self.requires("gtsam/4.0.3")
+        self.requires("tbb/2020.2", override=True)
 
     def package(self):
         # self.copy("*.h", dst="include", src="src")
