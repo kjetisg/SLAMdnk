@@ -80,6 +80,18 @@ int main(int argc, char* argv[])
     po::store(po::parse_command_line(argc, argv, desc), vm);
     po::notify(vm);
 
+
+    // create color multi threaded logger
+    auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+    console_sink->set_level(spdlog::level::debug);
+    console_sink->set_pattern("[%H:%M:%S] [%n] [%^%l%$] [thread %t] %v");
+
+    std::vector<spdlog::sink_ptr> sinks{console_sink}; //Add more sinks as necessary
+    auto logger = std::make_shared<spdlog::logger>("SLAMdnk_logger", std::begin(sinks), std::end(sinks));
+    spdlog::set_default_logger(logger);
+    logger->set_level(spdlog::level::debug);
+
+
     FeatureExtractor fex;
 
     if (vm.count("help")) 
@@ -109,15 +121,6 @@ int main(int argc, char* argv[])
     else 
         std::cout << "Image stream source was not set.\n";
 
-    // create color multi threaded logger
-    auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-    console_sink->set_level(spdlog::level::debug);
-    console_sink->set_pattern("[%H:%M:%S] [%n] [%^%l%$] [thread %t] %v");
-
-    std::vector<spdlog::sink_ptr> sinks{console_sink}; //Add more sinks as necessary
-    auto logger = std::make_shared<spdlog::logger>("SLAMdnk_logger", std::begin(sinks), std::end(sinks));
-    spdlog::set_default_logger(logger);
-    logger->set_level(spdlog::level::debug);
 
     test_opencv_functionality(argc, argv);
     test_eigen_functionality();
