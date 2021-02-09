@@ -119,7 +119,7 @@ int main(int argc, char* argv[])
         }
     } 
     else 
-        spdlog::info("Image stream source was not set.)";
+        spdlog::info("Image stream source was not set.");
 
 
     test_opencv_functionality(argc, argv);
