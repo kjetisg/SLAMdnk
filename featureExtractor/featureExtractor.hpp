@@ -80,6 +80,8 @@ public:
     FeatureExtractor();
 
     bool startCameraStream();
+    bool startFileStream();
+    void setStreamUrl(const std::string & url_str);
     void SFM_example();
 
 protected:
@@ -87,6 +89,8 @@ protected:
 private:
     std::string m_imagePath_;
     std::string m_videoUrl_;
+    static constexpr std::uint16_t UdpPort { 10901 }
+    ;
     std::unique_ptr<cv::VideoCapture> m_imgStream_;
     cv::Mat m_currentImage_;
 

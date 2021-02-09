@@ -47,11 +47,12 @@ set(SLAMdnk_MAIN_OBJS
     ${SLAMdnk_ROOT}/CMakeLists.txt
 )
 
-# add_library(${PROJECT_NAME}_lib MODULE "")#STATIC ${SLAMdnk_MAIN_OBJS} ${SLAMdnk_SRC})
+add_library(${PROJECT_LIB}  "")#STATIC ${SLAMdnk_MAIN_OBJS} ${SLAMdnk_SRC})
 # set_target_properties(${PROJECT_NAME}_lib PROPERTIES LINKER_LANGUAGE CXX)
 add_subdirectory(${FEATURE_EXTRACTOR_DIR})
 
-#
+add_executable(${PROJECT_NAME} ${SLAMdnk_MAIN_OBJS})
+
 # target_link_libraries(myApp PRIVATE
 # $<IF:$<CONFIG:Debug>,checkedAlgo,fastAlgo>
 find_package(OpenCV)
@@ -73,7 +74,7 @@ set(EXTERNAL_LIBRARIES
     # ${CONAN_LIBS}
 )
 
-add_executable(${PROJECT_NAME} ${SLAMdnk_MAIN_OBJS})
+
 
 # target_include_directories( ${PROJECT_NAME} PRIVATE
 #     ${CMAKE_CURRENT_SOURCE_DIR}
@@ -89,8 +90,8 @@ add_executable(${PROJECT_NAME} ${SLAMdnk_MAIN_OBJS})
 
 target_link_libraries(${PROJECT_NAME} 
     PUBLIC 
-        # ${PROJECT_LIB} 
-        FeatureExtractorLib 
+        ${PROJECT_LIB} 
+        # FeatureExtractorLib 
         ${EXTERNAL_LIBRARIES}
 )
 

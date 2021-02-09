@@ -13,7 +13,11 @@ std::string exec(const char* cmd) {
     return result;
 }
 
-
+bool FeatureExtractor::startFileStream()
+{
+    m_imgStream_ = std::make_unique<cv::VideoCapture>(m_imagePath_);
+    return m_imgStream_->isOpened();
+}
 
 FeatureExtractor::FeatureExtractor()
 {
@@ -110,6 +114,11 @@ FeatureExtractor::FeatureExtractor()
 
 }
 
+void FeatureExtractor::setStreamUrl(const std::string & url_str)
+{
+    m_videoUrl_ = "udp://@" + m_videoUrl_ + ":" + std::to_string(UdpPort);
+}
+
 bool FeatureExtractor::startCameraStream()
 {
     if (!m_imgStream_)
@@ -120,7 +129,9 @@ bool FeatureExtractor::startCameraStream()
 
     return m_imgStream_->isOpened();
 }
-
+enum {GAUSSIAN, BLUR, MEDIAN};
+int sigma = 3;
+int smoothType = GAUSSIAN;
 void FeatureExtractor::SFM_example()
 {
     spdlog::info("Starting SFM example...");
@@ -129,12 +140,42 @@ void FeatureExtractor::SFM_example()
         cv::Ptr<cv::AKAZE> feature = cv::AKAZE::create();
         cv::Ptr<cv::DescriptorMatcher> matcher = cv::DescriptorMatcher::create("BruteForce-Hamming");
         
-        // cv::namedWindow("img", cv::WINDOW_NORMAL);
+        cv::namedWindow("img", cv::WINDOW_NORMAL);
         
         //! Extract features:
         auto counter = 0;
-        while (m_imgStream_->isOpened() && counter < 30)
+        while (m_imgStream_->isOpened() && counter < 10)
         {
+            cv::namedWindow("Laplacian", cv::WINDOW_AUTOSIZE);
+            cv::createTrackbar("Sigma", "Laplacian", &sigma, 15, 0);
+            cv::Mat smoothed, laplace, result;
+            for(;;)
+            {
+                cv::Mat frame;
+                m_imgStream_->read(frame);
+                if( frame.empty() )
+                    break;
+                int ksize = (sigma*5)|1;
+                if(smoothType == GAUSSIAN)
+                    cv::GaussianBlur(frame, smoothed, cv::Size(ksize, ksize), sigma, sigma);
+                else if(smoothType == BLUR)
+                    cv::blur(frame, smoothed, cv::Size(ksize, ksize));
+                else
+                    cv::medianBlur(frame, smoothed, ksize);
+                cv::Laplacian(smoothed, laplace, CV_16S, 5);
+                cv::convertScaleAbs(laplace, result, (sigma+1)*0.25);
+                cv::imshow("Laplacian", result);
+                char c = (char)cv::waitKey(30);
+                if( c == ' ' )
+                    smoothType = smoothType == GAUSSIAN ? BLUR : smoothType == BLUR ? MEDIAN : GAUSSIAN;
+                if( c == 'q' || c == 'Q' || c == 27 )
+                    break;
+            }
+
+            break;
+
+
+
             cv::Mat frame;
             if (m_imgStream_->read(frame))
             {
@@ -214,8 +255,8 @@ void FeatureExtractor::SFM_example()
 
                 cv::resize(canvas, canvas, canvas.size()/2);
 
-                // cv::imshow("img", canvas);
-                // cv::waitKey(1);
+                cv::imshow("img", canvas);
+                cv::waitKey(1);
             }
         }
     }
