@@ -24,6 +24,8 @@ FeatureExtractor::FeatureExtractor()
     // m_imagePath_ = "~/DEV/source/data/tum_vision_mono/sequence_07/images/%05d.jpg";
     m_imagePath_ = R"(/home/kjetilsg/DEV/source/data/tum_vision_mono/sequence_07/images/00000.jpg)";
     // m_videoUrl_ = "udp://@172.19.240.1:10901"; 
+
+    //! Snippet to get WSL2 IP address automatically:
     std::string wsl2_ip;
     std::smatch match;
     std::regex reg{R"(\sinet ((?:\d+\.){3}\d+)/)"};
@@ -37,12 +39,6 @@ FeatureExtractor::FeatureExtractor()
     }
     spdlog::info("IP address: {}", m_videoUrl_);
 
-    // m_videoUrl_ = "udp://@172.19.243.9:10901";
-    // m_videoUrl_ = "https://www.sample-videos.com/video123/mp4/480/big_buck_bunny_480p_10mb.mp4";
-
-    // cv::Mat image;
-    // cv::VideoCapture video_capture(m_imagePath_);
-    // cv::VideoCapture video_client(m_videoUrl_, cv::CAP_FFMPEG);
     try
     {
         m_imgStream_ = std::make_unique<cv::VideoCapture>(cv::CAP_FFMPEG);
@@ -51,67 +47,11 @@ FeatureExtractor::FeatureExtractor()
     {
         spdlog::warn("Could not instantiate video capture with current setup.");
     }
+}
 
-    // cv::VideoWriter videoStream("appsrc ! videoconvert ! videoscale !"
-    //     "video/x-raw,width=320,height=240 ! theoraenc !"
-    //     "oggmux ! tcpserversink host=172.19.240.1 port=8080 "
-    //     "recover-policy=keyframe sync-method=latest-keyframe sync=true",
-    //     cv::CAP_GSTREAMER, 0, 5, cv::Size(320,240), true);
-
-    // auto gst_out = "appsrc ! videoconvert ! videoscale ! video/x-raw,width=320,height=240 ! udpsink host=172.19.240.1 port=8080 ";
-    // cv::VideoWriter videoStream(gst_out, cv::CAP_GSTREAMER, 0, 5, cv::Size(320,240), true);
-
-    // if ( !video_capture.isOpened() )
-    // {
-    //     spdlog::warn("Could not open video stream");
-    // }
-  
-    // if (m_videoUrl_.empty())
-    // {
-    //     while( video_capture.isOpened() )
-    //     {
-    //         video_capture.read(image);
-    //         spdlog::debug("Read image dims: {}", image.dims);
-    //         spdlog::debug("Read image cols: {}", image.cols);
-    //         exit(0);
-    //     }
-    // }
-    // else
-    // {
-    //     for (;;)
-    //     {
-    //         if (!video_client.isOpened())
-    //         {
-    //             spdlog::error("VideoCapture from URL failed.");
-    //             break;
-    //         }
-    //         cv::Mat img;
-    //         // video_client >> img;
-    //         video_client.read(img);
-    //         if (!img.empty())
-    //             cv::resize(img, img, cv::Size(320,240));
-    //         videoStream.write(img);
-    //         spdlog::debug("Image received, sending back");
-    //         // cv::imwrite("/home/kjetilsg/DEV/webcam.jpg", img);
-    //         // exit(0);
-    //     }
-    //     // spdlog::debug("Attempting reading video from URL...");
-    //     // while (video_client.isOpened())
-    //     // {
-    //     //     cv::Mat frame;
-    //     //     if (video_client.read(frame))
-    //     //     {
-    //     //         spdlog::debug("Image received, returning...");
-    //     //         videoStream.write(frame);
-    //     //     }
-    //     //     else
-    //     //     {
-    //     //         break;
-    //     //     }
-    //     // }
-    //     // spdlog::debug("URL video stream stopped.");
-    // }
-
+void FeatureExtractor::setStreamPath(const std::string & path)
+{
+    m_imagePath_ = path;
 }
 
 void FeatureExtractor::setStreamUrl(const std::string & url_str)
@@ -201,11 +141,6 @@ void FeatureExtractor::SFM_example()
             }
         }
 
-        // for (auto i = 1; i < SFM.img_pose.size(); ++i)
-        // {
-        //     auto & poseA = SFM.img_pose[i-1];
-        //     auto & poseB = SFM.img_pose[i];
-        // }
         // Match features between all images
         for (size_t i=0; i < SFM.img_pose.size()-1; i++) 
         {

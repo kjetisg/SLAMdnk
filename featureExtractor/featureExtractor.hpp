@@ -82,6 +82,7 @@ public:
     bool startCameraStream();
     bool startFileStream();
     void setStreamUrl(const std::string & url_str);
+    void setStreamPath(const std::string & path);
     void SFM_example();
 
 protected:

@@ -101,6 +101,7 @@ int main(int argc, char* argv[])
         }
         else // Assume file path-stream
         {
+            fex.setStreamPath(stream_src);
             if (fex.startFileStream())
                 fex.SFM_example();
         }
