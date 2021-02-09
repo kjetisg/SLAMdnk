@@ -15,7 +15,12 @@ std::string exec(const char* cmd) {
 
 bool FeatureExtractor::startFileStream()
 {
-    m_imgStream_ = std::make_unique<cv::VideoCapture>(m_imagePath_);
+    if (!m_imgStream_)
+        return false;
+
+    if ( !m_imagePath_.empty() )
+        m_imgStream_->open(m_imagePath_);
+
     return m_imgStream_->isOpened();
 }
 
