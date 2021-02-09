@@ -102,7 +102,7 @@ int main(int argc, char* argv[])
     if (vm.count("image_stream")) 
     {
         auto const stream_src = vm["image_stream"].as<std::string>();
-        std::cout << "Image stream source was set to " << stream_src << ".\n";
+        spdlog::info("Image stream source was set to {}.", stream_src);
         if ( !std::filesystem::exists(stream_src) )
         {
             fex.setStreamUrl(stream_src);
@@ -119,7 +119,7 @@ int main(int argc, char* argv[])
         }
     } 
     else 
-        std::cout << "Image stream source was not set.\n";
+        spdlog::info("Image stream source was not set.)";
 
 
     test_opencv_functionality(argc, argv);
