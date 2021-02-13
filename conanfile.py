@@ -24,6 +24,7 @@ class SLAMdnkConan(ConanFile):
 
     def configure(self):
         self.options["opencv"].parallel="tbb"
+        # self.options["opencv"].with_contrib=True
         self.options["gtsam"].with_TBB=True
 
     def requirements(self):
@@ -31,6 +32,8 @@ class SLAMdnkConan(ConanFile):
         self.requires("opencv/4.5.1")
         self.requires("gtsam/4.0.3")
         self.requires("tbb/2020.2", override=True)
+        self.requires("spdlog/1.8.2")
+        self.requires("gstreamer/1.18.0")
 
     def package(self):
         # self.copy("*.h", dst="include", src="src")
